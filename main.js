@@ -32,118 +32,125 @@ let item1 = new ItemTemplate(
 
 itemName.textContent = item1.name + " " + "(niveau " + item1.level + ")";
 
-effects.forEach((effect) => {
+function DisplayEffects(index) {
   let effectElement = document.createElement("div");
-  effectElement.textContent = effect;
-  effectElement.className = "effect : " + effects.indexOf(effect);
+  effectElement.textContent = effects[index];
+  effectElement.id = index;
+  effectElement.setAttribute("line-index", index);
   effectsDisplay.appendChild(effectElement);
-});
-
-item1.minEffects.forEach((effect) => {
-  let statElement = document.createElement("div");
-  statElement.textContent = effect;
-  itemMinStat.appendChild(statElement);
-});
-
-item1.maxEffects.forEach((effect) => {
-  let statElement = document.createElement("div");
-  statElement.textContent = effect;
-  itemMaxStat.appendChild(statElement);
-});
-
-function DisplayStats(item) {
-  item.effects.forEach((effect, index) => {
-    let statElement = document.createElement("div");
-    statElement.id = index;
-    statElement.textContent = effect;
-    itemStats.appendChild(statElement);
-  });
 }
 
-DisplayStats(item1);
+function DisplayMinStat(item, index) {
+  let minStat = document.createElement("div");
+  minStat.textContent = item.minEffects[index];
+  minStat.id = index;
+  minStat.setAttribute("line-index", index);
 
-item1.effects.forEach((_, index) => {
+  itemMinStat.appendChild(minStat);
+}
+
+function DisplayMaxStat(item, index) {
+  let maxStat = document.createElement("div");
+  maxStat.textContent = item.maxEffects[index];
+  maxStat.id = index;
+  maxStat.setAttribute("line-index", index);
+
+  itemMaxStat.appendChild(maxStat);
+}
+
+function DisplayStats(item, index) {
+  let itemStat = document.createElement("div");
+  itemStat.textContent = item.effects[index];
+  itemStat.id = index;
+  itemStat.setAttribute("stat-index", index);
+  itemStat.setAttribute("line-index", index);
+  itemStats.appendChild(itemStat);
+}
+
+function increaseStat(index) {
   let increaseStat = document.createElement("div");
   increaseStat.textContent = "+1";
   increaseStat.className =
     "border-1 flex justify-center items-center rounded-md w-10 cursor-pointer";
-  increaseStat.setAttribute("data-index", index);
+  increaseStat.setAttribute("btn-index", index);
   increaseButton.appendChild(increaseStat);
-});
+}
+
+function loadItem(item) {
+  for (let i = 0; i < item.effects.length; i++) {
+    DisplayEffects(i);
+    DisplayMinStat(item, i);
+    DisplayMaxStat(item, i);
+    DisplayStats(item, i);
+    increaseStat(i);
+  }
+}
+
+loadItem(item1);
 
 increaseButton.addEventListener("click", (event) => {
-  if (event.target && event.target.matches("div[data-index]")) {
-    let index = event.target.getAttribute("data-index");
-    increaseState(item1, index);
+  if (event.target && event.target.matches("div[btn-index]")) {
+    let index = event.target.getAttribute("btn-index");
+    changeItemStat(item1, index);
   }
 });
 
-function increaseState(item, index) {
+function refreshDisplay(item, index) {
+  let itemStat = document.querySelector(`[stat-index="${index}"]`);
+  itemStat.textContent = item.effects[index];
+}
+
+function highlightLine(index, color) {
+  let lines = document.querySelectorAll(`[line-index="${index}"]`);
+
+  lines.forEach((line) => {
+    line.classList.add(color);
+    setTimeout(() => {
+      line.classList.remove(color);
+    }, 500);
+  });
+}
+
+function changeItemStat(item, index) {
   let chance = Math.floor(Math.random() * 100);
-  let otherIndex = Math.floor(Math.random() * effects.length);
+  let attempts = 0; // Compteur de tentatives
 
-  let increaseStat = document.getElementById(index);
-  let decreaseStat = document.getElementById(otherIndex);
+  if (effects.length > 1) {
+    let randomIndex;
 
-  function increaseColor() {
-    increaseStat.classList.add("text-green-500");
-    setTimeout(() => {
-      increaseStat.classList.remove("text-green-500");
-    }, 500);
-  }
+    do {
+      randomIndex = Math.floor(Math.random() * effects.length);
+      attempts++;
 
-  function decreaseColor() {
-    decreaseStat.classList.add("text-red-500");
-    setTimeout(() => {
-      decreaseStat.classList.remove("text-red-500");
-    }, 500);
-  }
+      if (attempts > 20) {
+        // Si plus de 20 tentatives, on considère qu'il y a un problème
+        console.error(
+          "Trop de tentatives pour générer randomIndex différent de index. Vérifiez votre logique."
+        );
+        return; // Ou prendre une autre action
+      }
+    } while (randomIndex === index);
 
-  // Assurez-vous que otherIndex est différent de index
-  while (otherIndex === index) {
-    console.log("Boucle while exécutée");
-    otherIndex = Math.floor(Math.random() * effects.length);
-  }
+    console.log(index, randomIndex);
 
-  // Si c'est un succès critique alors on augmente (20%)
-  if (chance <= 20) {
-    item.effects[index] = item.effects[index] + 1;
-    increaseColor();
-  }
-
-  // Si c'est un succès neutre alors on augmente (selon le jet) mais on baisse un des autres (60%)
-  else if (chance > 20 && chance < 80) {
-    if (item.effects[index] < Math.floor(item.maxEffects[index] * 0.33)) {
+    if (chance <= 40) {
+      // succès critique
       item.effects[index] = item.effects[index] + 1;
-      increaseColor();
-    } else if (
-      item.effects[index] < Math.floor(item.maxEffects[index] * 0.66)
-    ) {
-      if (Math.random() < 0.8) {
-        item.effects[index] = item.effects[index] + 1;
-        increaseColor();
-      }
-    } else {
-      if (Math.random() < 1 / 3) {
-        item.effects[index] = item.effects[index] + 1;
-        increaseColor();
-      }
-    }
-
-    if (item.effects[otherIndex] > 0) {
-      item.effects[otherIndex] = item.effects[otherIndex] - 1;
-      decreaseColor();
+      refreshDisplay(item, index);
+      highlightLine(index, "bg-green-300");
+    } else if (chance > 40 && chance < 90) {
+      // succès neutre
+      item.effects[index] = item.effects[index] + 1;
+      item.effects[randomIndex] = item.effects[randomIndex] - 1;
+      refreshDisplay(item, index);
+      highlightLine(index, "bg-green-300");
+      refreshDisplay(item, randomIndex);
+      highlightLine(randomIndex, "bg-red-300");
+    } else if (chance >= 90) {
+      // échec critique
+      item.effects[randomIndex] = item.effects[randomIndex] - 1;
+      refreshDisplay(item, randomIndex);
+      highlightLine(randomIndex, "bg-red-300");
     }
   }
-
-  // Si c'est un échec alors on n'augmente pas et on baisse un des autres (20%)
-  else {
-    if (item.effects[otherIndex] > 0) {
-      item.effects[otherIndex] = item.effects[otherIndex] - 1;
-      decreaseColor();
-    }
-  }
-
-  increaseStat.textContent = item1.effects[index];
-  document.getElementById(otherIndex).textContent = item1.effects[otherIndex];
 }
