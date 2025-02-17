@@ -141,14 +141,18 @@ function changeItemStat(item, index) {
     } else if (chance > 40 && chance < 90) {
       // succès neutre
       item.effects[index] = item.effects[index] + 1;
-      item.effects[randomIndex] = item.effects[randomIndex] - 1;
+      if (item.effects[randomIndex] > 0) {
+        item.effects[randomIndex] = item.effects[randomIndex] - 1;
+      }
       refreshDisplay(item, index);
       highlightLine(index, "bg-green-300");
       refreshDisplay(item, randomIndex);
       highlightLine(randomIndex, "bg-red-300");
     } else if (chance >= 90) {
       // échec critique
-      item.effects[randomIndex] = item.effects[randomIndex] - 1;
+      if (item.effects[randomIndex] > 0) {
+        item.effects[randomIndex] = item.effects[randomIndex] - 1;
+      }
       refreshDisplay(item, randomIndex);
       highlightLine(randomIndex, "bg-red-300");
     }
