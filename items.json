@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Chapeau Piou Vert",
+      "level": 9,
+      "stats": {
+        "agility": 10,
+        "vitality": 10
+      }
+    },
+    {
+      "id": 2,
+      "name": "Chapeau de l'Aventurier",
+      "level": 11,
+      "stats": {
+        "agility": 10,
+        "inteligence": 10,
+        "strength": 10,
+        "chance": 10,
+        "windsdom": 10
+      }
+    }
+  ]
+}
