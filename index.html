@@ -9,24 +9,29 @@
   </head>
   <body>
     <head>
-      <h1 class="bg-amber-400 h-10 flex justify-center items-center text-2xl">
+      <h1 class="bg-amber-400 items-center text-2xl p-2">
         Forgemagie Simulator
       </h1>
     </head>
     <main>
-      <div class="flex justify-center m-4">
+      <div class="text-center flex justify-center mx-4 mt-4">
         <h1
-          class="border-1 hover:bg-gray-500 cursor-pointer p-4 transition duration-300 ease-in-out"
+          class="bg-gray-400 rounded-2xl hover:bg-amber-400 cursor-pointer p-4 transition duration-300 ease-in-out w-60"
           id="item-selector"
         >
           Choisir l'item...
         </h1>
-        <div id="items-list"></div>
+      </div>
+      <div class="flex justify-center">
+        <div
+          id="items-list"
+          class="text-center hidden border-1 w-60 overflow-y-auto h-60 rounded-xl"
+        ></div>
       </div>
       <div class="flex justify-center m-4">
-        <h1 class="border-1 px-4 text-2xl" id="item-name"></h1>
+        <h1 class="border-1 px-4 text-2xl hidden" id="item-name"></h1>
       </div>
-      <div class="m-4 border-1 p-4">
+      <div class="m-4 border-1 p-4 hidden" id="item-display">
         <h1 id="item-weight"></h1>
         <div class="grid grid-cols-5">
           <div class="" id="effects"></div>

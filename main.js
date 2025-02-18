@@ -1,96 +1,110 @@
-import items from "./items.json" assert { type: "json" };
-
 const GREEN_HIGHLIGHT = "bg-green-300";
 const RED_HIGHLIGHT = "bg-red-300";
 
 let itemsList = document.getElementById("items-list");
+let itemsButton = document.getElementById("item-selector");
 let itemName = document.getElementById("item-name");
+let itemDisplay = document.getElementById("item-display");
 let itemWeight = document.getElementById("item-weight");
 let itemMinStat = document.getElementById("min-stat");
 let itemMaxStat = document.getElementById("max-stat");
 let itemStats = document.getElementById("item-stats");
 let effectsDisplay = document.getElementById("effects");
 let increaseButton = document.getElementById("increase");
-let effects = ["inteligence", "force", "agilité", "sagesse", "chance"];
 
-function ItemTemplate(name, level, minEffects, maxEffects) {
-  this.name = name;
-  this.level = level;
-  this.minEffects = minEffects;
-  this.maxEffects = maxEffects;
-  this.effects = this.randomizeEffects(minEffects, maxEffects);
+let actualWeight = 0;
+let maxWeight = 0;
+let itemSelect;
+
+// Récupération du json sur le serveur
+let dataParsed;
+
+async function fetchData() {
+  const response = await fetch("http://localhost:3000/");
+  const data = await response.json();
+  dataParsed = data;
 }
 
-ItemTemplate.prototype.randomizeEffects = function (minEffects, maxEffects) {
-  return minEffects.map((min, index) => {
-    let max = maxEffects[index];
-    let minVal = Math.ceil(min);
-    let maxVal = Math.floor(max);
-    return Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
+//Attend d'avoir récupérer et stocker les valeurs dans dataParsed
+await fetchData();
+
+//Randomize le jet actuel de l'item
+function randomizeActualWeight() {
+  dataParsed.forEach((item) => {
+    for (const stat in item.stats) {
+      let min = item.stats[stat].minValue;
+      let max = item.stats[stat].maxValue;
+      let minVal = Math.ceil(min);
+      let maxVal = Math.floor(max);
+      item.stats[stat].actualValue =
+        Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
+    }
   });
-};
+}
 
-const itemsParse = items.items;
+randomizeActualWeight();
 
-itemsParse.forEach((item) => {
-  let itemList = document.createElement("div");
-  itemList.textContent = item.name + " .niv " + item.level + " ";
+function displayItem() {
+  itemsList.innerHTML = "";
 
-  itemsList.appendChild(itemList);
+  if (itemsList.classList.contains("block")) {
+    dataParsed.forEach((item) => {
+      let itemList = document.createElement("div");
+      itemList.textContent = item.name + " .niv " + item.level;
+      itemList.id = `item-${item.id}`;
+      itemList.classList = "border-b-1 p-2 hover:bg-amber-400 cursor-pointer";
+
+      itemList.addEventListener("click", () => {
+        itemsList.classList.add("hidden");
+        itemSelect = item;
+
+        console.log("Item sélectionné:", item);
+
+        itemName.textContent = item.name + " .Niv " + item.level;
+        itemWeight.textContent = "";
+        effectsDisplay.textContent = "";
+        itemMinStat.textContent = "";
+        itemMaxStat.textContent = "";
+        itemStats.textContent = "";
+        increaseButton.textContent = "";
+        itemName.classList.remove("hidden");
+        itemDisplay.classList.remove("hidden");
+        actualWeight = 0;
+        maxWeight = 0;
+
+        for (const stat in item.stats) {
+          const effect = stat;
+          const min = item.stats[stat].minValue;
+          const max = item.stats[stat].maxValue;
+          const actualValue = item.stats[stat].actualValue;
+          actualWeight += actualValue;
+          maxWeight += max;
+
+          effectsDisplay.innerHTML += `<p>${effect}</p>`;
+          itemMinStat.innerHTML += `<p>${min}</p>`;
+          itemMaxStat.innerHTML += `<p>${max}</p>`;
+          itemStats.innerHTML += `<p>${actualValue}</p>`;
+          increaseStat(item.id);
+        }
+
+        itemWeight.innerHTML += `Poids : ${actualWeight} / ${maxWeight}`;
+      });
+
+      itemsList.appendChild(itemList);
+    });
+  }
+}
+
+itemsButton.addEventListener("click", async () => {
+  itemsList.classList.toggle("hidden");
+  itemsList.classList.toggle("block");
+  if (itemsList.classList.contains("block")) {
+    displayItem();
+  }
 });
 
-let item1 = new ItemTemplate(
-  "Chapeau de l'aventurier",
-  11,
-  [1, 1, 1, 1, 1],
-  [10, 10, 10, 10, 10]
-);
-
-itemName.textContent = item1.name + " " + "(niveau " + item1.level + ")";
-itemWeight.textContent =
-  "Poids : " + getActualWeight(item1) + "/" + getMaxWeight(item1);
-
-function DisplayEffects(index) {
-  let effectElement = document.createElement("div");
-  effectElement.textContent = effects[index];
-  effectElement.id = index;
-  effectElement.className = "my-1";
-  effectElement.setAttribute("line-index", index);
-  effectsDisplay.appendChild(effectElement);
-}
-
-function DisplayMinStat(item, index) {
-  let minStat = document.createElement("div");
-  minStat.textContent = item.minEffects[index];
-  minStat.id = index;
-  minStat.className = "my-1";
-  minStat.setAttribute("line-index", index);
-
-  itemMinStat.appendChild(minStat);
-}
-
-function DisplayMaxStat(item, index) {
-  let maxStat = document.createElement("div");
-  maxStat.textContent = item.maxEffects[index];
-  maxStat.className = "my-1";
-  maxStat.id = index;
-  maxStat.setAttribute("line-index", index);
-
-  itemMaxStat.appendChild(maxStat);
-}
-
-function DisplayStats(item, index) {
-  let itemStat = document.createElement("div");
-  itemStat.textContent = item.effects[index];
-  itemStat.className = "my-1";
-  itemStat.id = index;
-  itemStat.setAttribute("stat-index", index);
-  itemStat.setAttribute("line-index", index);
-  itemStats.appendChild(itemStat);
-}
-
 function increaseStat(index) {
-  let increaseStat = document.createElement("div");
+  let increaseStat = document.createElement("p");
   increaseStat.textContent = "+1";
   increaseStat.className =
     "flex justify-center items-center rounded-md cursor-pointer border-1 hover:bg-amber-400 transition duration-500 ease-in-out h-[24px] my-1 w-10";
@@ -98,35 +112,9 @@ function increaseStat(index) {
   increaseButton.appendChild(increaseStat);
 }
 
-function loadItem(item) {
-  itemMinStat.innerHTML = "";
-  itemMaxStat.innerHTML = "";
-  itemStats.innerHTML = "";
-  effectsDisplay.innerHTML = "";
-  increaseButton.innerHTML = "";
-
-  for (let i = 0; i < item.effects.length; i++) {
-    DisplayEffects(i);
-    DisplayMinStat(item, i);
-    DisplayMaxStat(item, i);
-    DisplayStats(item, i);
-    increaseStat(i);
-  }
-}
-
-loadItem(item1);
-
-increaseButton.addEventListener("click", (event) => {
-  if (event.target && event.target.matches("div[btn-index]")) {
-    let index = event.target.getAttribute("btn-index");
-    changeItemStat(item1, index);
-  }
+increaseButton.addEventListener("click", () => {
+  changeItemStat(itemSelect);
 });
-
-function refreshDisplay(item, index) {
-  let itemStat = document.querySelector(`[stat-index="${index}"]`);
-  itemStat.textContent = item.effects[index];
-}
 
 function highlightLine(index, color) {
   let lines = document.querySelectorAll(`[line-index="${index}"]`);
@@ -139,29 +127,13 @@ function highlightLine(index, color) {
   });
 }
 
-function getActualWeight(item) {
-  let totalWeight = 0;
-
-  item.effects.forEach((effect, index) => {
-    totalWeight += effect;
-  });
-  return totalWeight;
+function changeItemStat(item) {
+  for (const stat in item.stats) {
+    item.stats[stat].actualValue += 1;
+    console.log(item);
+  }
 }
-
-function getMaxWeight(item) {
-  let totalWeight = 0;
-
-  item.maxEffects.forEach((effect, index) => {
-    totalWeight += effect;
-  });
-  return totalWeight;
-}
-
-function changeItemStat(item, index) {
-  let actualWeight = getActualWeight(item);
-  let maxWeight = getMaxWeight(item);
-
-  const tiers = [
+/*const tiers = [
     { weight: maxWeight * 0.2, critical: 0.5, neutral: 0.4 },
     { weight: maxWeight * 0.5, critical: 0.4, neutral: 0.5 },
     { weight: maxWeight * 0.7, critical: 0.3, neutral: 0.6 },
@@ -176,15 +148,13 @@ function changeItemStat(item, index) {
 
   let chance = Math.random();
 
-  if (
-    chance <= criticalChance &&
-    item.effects[index] < item.maxEffects[index] * 2
-  ) {
-    item.effects[index] += 1;
+  if (chance <= criticalChance) {
+    item.stats[0] += 1;
     refreshDisplay(item, index);
     highlightLine(index, GREEN_HIGHLIGHT);
     console.log("Succès critique");
-  } else if (
+  }
+} else if (
     chance > criticalChance &&
     chance < criticalChance + neutralChance
   ) {
@@ -223,4 +193,4 @@ function changeItemStat(item, index) {
 
   itemWeight.textContent =
     "Poids : " + getActualWeight(item1) + "/" + getMaxWeight(item1);
-}
+}*/
