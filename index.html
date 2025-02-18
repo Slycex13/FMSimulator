@@ -8,32 +8,25 @@
     <title>Forgemagie Sim</title>
   </head>
   <body>
-    <head>
+    <main>
       <h1 class="bg-amber-400 items-center text-2xl p-2">
         Forgemagie Simulator
       </h1>
-    </head>
-    <main>
       <div class="text-center flex justify-center mx-4 mt-4">
         <h1
-          class="bg-gray-400 rounded-2xl hover:bg-amber-400 cursor-pointer p-4 transition duration-300 ease-in-out w-60"
+          class="bg-gray-200 rounded-2xl hover:bg-amber-400 cursor-pointer p-4 transition duration-300 ease-in-out w-60"
           id="item-selector"
         >
           Choisir l'item...
         </h1>
       </div>
-      <div class="flex justify-center">
-        <div
-          id="items-list"
-          class="text-center hidden border-1 w-60 overflow-y-auto h-60 rounded-xl"
-        ></div>
-      </div>
-      <div class="flex justify-center m-4">
-        <h1 class="border-1 px-4 text-2xl hidden" id="item-name"></h1>
-      </div>
-      <div class="m-4 border-1 p-4 hidden" id="item-display">
-        <h1 id="item-weight"></h1>
-        <div class="grid grid-cols-5">
+
+      <div class="mx-4 hidden" id="item-display">
+        <div class="flex justify-between mt-4 bg-amber-400 rounded-t-2xl">
+          <h1 class="rounded-2xl p-4 text-2xl hidden" id="item-name"></h1>
+          <p class="p-4 text-2xl" id="item-weight"></p>
+        </div>
+        <div class="grid grid-cols-5 bg-gray-300 p-4">
           <div class="" id="effects"></div>
           <div class="" id="min-stat"></div>
           <div class="" id="max-stat"></div>
@@ -42,5 +35,20 @@
         </div>
       </div>
     </main>
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden text-center"
+      id="items-select-panel"
+    >
+      <div class="flex justify-between rounded-t-lg bg-amber-400">
+        <h1 class="bg-amber-500 rounded-t-lg p-2">Liste d'items</h1>
+        <button class="p-2 cursor-pointer text-2xl" id="close-panel-button">
+          X
+        </button>
+      </div>
+      <div
+        id="items-list"
+        class="text-center w-60 overflow-y-auto h-60 bg-gray-200 rounded-b-lg"
+      ></div>
+    </div>
   </body>
 </html>

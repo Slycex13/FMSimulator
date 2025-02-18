@@ -1,7 +1,9 @@
 const GREEN_HIGHLIGHT = "bg-green-300";
 const RED_HIGHLIGHT = "bg-red-300";
 
+let itemsPanel = document.getElementById("items-select-panel");
 let itemsList = document.getElementById("items-list");
+let closePanel = document.getElementById("close-panel-button");
 let itemsButton = document.getElementById("item-selector");
 let itemName = document.getElementById("item-name");
 let itemDisplay = document.getElementById("item-display");
@@ -47,7 +49,7 @@ randomizeActualWeight();
 function displayItem() {
   itemsList.innerHTML = "";
 
-  if (itemsList.classList.contains("block")) {
+  if (itemsPanel.classList.contains("block")) {
     dataParsed.forEach((item) => {
       let itemList = document.createElement("div");
       itemList.textContent = item.name + " .niv " + item.level;
@@ -55,10 +57,12 @@ function displayItem() {
       itemList.classList = "border-b-1 p-2 hover:bg-amber-400 cursor-pointer";
 
       itemList.addEventListener("click", () => {
-        itemsList.classList.add("hidden");
+        itemsPanel.classList.add("hidden");
         itemSelect = item;
 
         console.log("Item sélectionné:", item);
+        const interf = document.querySelector("main");
+        interf.style.opacity = 1;
 
         itemName.textContent = item.name + " .Niv " + item.level;
         itemWeight.textContent = "";
@@ -95,10 +99,20 @@ function displayItem() {
   }
 }
 
+closePanel.addEventListener("click", () => {
+  itemsPanel.classList.add("hidden");
+  itemsPanel.classList.remove("block");
+  const interf = document.querySelector("main");
+  interf.style.opacity = 1;
+});
+
 itemsButton.addEventListener("click", async () => {
-  itemsList.classList.toggle("hidden");
-  itemsList.classList.toggle("block");
-  if (itemsList.classList.contains("block")) {
+  const interf = document.querySelector("main");
+  interf.style.opacity = 0.5;
+  itemsPanel.classList.remove("hidden");
+  itemsPanel.classList.add("block");
+
+  if (itemsPanel.classList.contains("block")) {
     displayItem();
   }
 });
