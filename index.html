@@ -7,14 +7,14 @@
     <script src="main.js" type="module" defer></script>
     <title>Forgemagie Sim</title>
   </head>
-  <body>
+  <body class="bg-[#2f2f2f]">
     <main>
       <h1 class="bg-amber-400 items-center text-2xl p-2">
         Forgemagie Simulator
       </h1>
       <div class="text-center flex justify-center mx-4 mt-4">
         <h1
-          class="bg-gray-200 rounded-2xl hover:bg-amber-400 cursor-pointer p-4 transition duration-300 ease-in-out w-60"
+          class="bg-amber-400 rounded-2xl hover:scale-110 cursor-pointer p-4 transition duration-300 ease-in-out w-60"
           id="item-selector"
         >
           Choisir l'item...
@@ -40,14 +40,17 @@
       id="items-select-panel"
     >
       <div class="flex justify-between rounded-t-lg bg-amber-400">
-        <h1 class="bg-amber-500 rounded-t-lg p-2">Liste d'items</h1>
-        <button class="p-2 cursor-pointer text-2xl" id="close-panel-button">
+        <h1 class="bg-amber-500 rounded-tl-lg p-2 w-60">Liste d'items</h1>
+        <button
+          class="p-2 cursor-pointer text-2xl w-12 hover:scale-120 transition ease-in-out duration-300"
+          id="close-panel-button"
+        >
           X
         </button>
       </div>
       <div
         id="items-list"
-        class="text-center w-60 overflow-y-auto h-60 bg-gray-200 rounded-b-lg"
+        class="text-center w-96 overflow-y-auto h-60 bg-gray-200 rounded-b-lg"
       ></div>
     </div>
   </body>
